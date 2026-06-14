@@ -1,3 +1,0 @@
-
-  # Portfolio Ismi Anjar Farida
-  
