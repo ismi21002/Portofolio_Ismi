@@ -1,0 +1,1430 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio Ismi Anjar Farida</title>
+
+    <!-- Fonts (same families used in components) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=DM+Sans:wght@200;300;400;500&family=Playfair+Display:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --primary: #c9a96e;
+        --background: #0a0a0c;
+        --card: #111114;
+        --border: rgba(255, 255, 255, 0.14);
+        --foreground: #f5f0f4;
+        --muted-foreground: rgba(245, 240, 244, 0.72);
+      }
+
+      * { box-sizing: border-box; }
+      html, body { height: 100%; margin: 0; }
+      body {
+        font-family: 'DM Sans', sans-serif;
+        background: var(--background);
+        color: var(--foreground);
+        overflow-x: hidden;
+      }
+
+      /* Utility-ish */
+      .container { max-width: 72rem; margin: 0 auto; padding: 0 1.5rem; }
+      .section { padding: 7rem 0; }
+      .bg-card { background: var(--card); }
+      .border-b { border-bottom: 1px solid var(--border); }
+      .border { border: 1px solid var(--border); }
+
+      /* Header */
+      header {
+        position: fixed; inset: 0 0 auto 0; z-index: 50;
+        transition: background 300ms ease, backdrop-filter 300ms ease, border-color 300ms ease;
+      }
+      header.scrolled {
+        background: rgba(10, 10, 12, 0.9);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+      }
+      nav {
+        height: 4rem; display: flex; align-items: center; justify-content: space-between;
+      }
+
+      .brand {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem; font-weight: 600;
+        color: var(--foreground); text-decoration: none; letter-spacing: 0.01em;
+      }
+      .navlink {
+        background: transparent; border: 0; cursor: pointer;
+        color: var(--muted-foreground);
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.85rem; font-weight: 500;
+        letter-spacing: 0.06em; text-transform: uppercase;
+        transition: color 200ms ease;
+      }
+      .navlink:hover { color: var(--primary); }
+
+      .iconBtn {
+        width: 2.75rem; height: 2.75rem; border-radius: 999px;
+        border: 1px solid transparent; background: transparent; cursor: pointer;
+        color: var(--foreground);
+        display: inline-flex; align-items: center; justify-content: center;
+      }
+
+      /* Mobile drawer */
+      .drawer {
+        position: fixed; left: 0; right: 0; top: 4rem; z-index: 49;
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        padding: 1.5rem;
+        display: flex; flex-direction: column; gap: 0.75rem;
+        transform-origin: top;
+      }
+      .drawer[data-open="false"] { opacity: 0; transform: translateY(-10px); pointer-events: none; }
+      .drawer[data-open="true"] { opacity: 1; transform: translateY(0); pointer-events: auto; transition: 200ms ease; }
+      .drawer button { background: transparent; border: 0; text-align: left; cursor: pointer; color: var(--foreground); }
+      .drawer a { color: var(--primary); text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+
+      /* Animations (whileInView) */
+      .reveal { opacity: 0; transform: translate3d(0, 20px, 0); }
+      .reveal[data-from-x="-20"] { transform: translate3d(-20px, 0, 0); }
+      .reveal[data-from-x="20"] { transform: translate3d(20px, 0, 0); }
+      .reveal[data-from-x="-30"] { transform: translate3d(-30px, 0, 0); }
+      .reveal[data-from-x="30"] { transform: translate3d(30px, 0, 0); }
+      .reveal[data-from-y="20"] { transform: translate3d(0, 20px, 0); }
+      .reveal.inview {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+        transition: opacity 600ms ease, transform 600ms ease;
+      }
+
+      /* Hero */
+      .hero {
+        position: relative; min-height: 100vh;
+        display: flex; align-items: center; overflow: hidden;
+      }
+      .gridOverlay {
+        position: absolute; inset: 0; pointer-events: none;
+        background-image:
+          linear-gradient(rgba(201,169,110,0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(201,169,110,0.03) 1px, transparent 1px);
+        background-size: 60px 60px;
+      }
+      .glow {
+        position: absolute;
+        top: 33%; right: 25%;
+        width: 600px; height: 600px; border-radius: 999px;
+        background: radial-gradient(circle, rgba(201,169,110,0.05) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .heroGrid {
+        position: relative;
+        max-width: 72rem;
+        width: 100%;
+        margin: 0 auto;
+        padding: 6rem 1.5rem 4rem;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 4rem;
+        align-items: center;
+      }
+      @media (min-width: 768px) {
+        .heroGrid { grid-template-columns: 1fr 1fr; gap: 4rem; padding-top: 7rem; }
+        .heroRight { justify-self: end; }
+      }
+
+      .badge {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.35rem 0.75rem;
+        border: 1px solid rgba(201,169,110,0.8);
+        color: var(--primary);
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        font-family: 'DM Mono', monospace;
+        font-weight: 600;
+        font-size: 0.7rem;
+      }
+      .heroTitle {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(2.4rem, 5vw, 4rem);
+        font-weight: 600;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+        margin: 0;
+      }
+      .heroTitle em { color: var(--primary); font-style: italic; }
+      .heroP {
+        color: var(--muted-foreground);
+        font-size: 1.05rem;
+        font-weight: 300;
+        line-height: 1.75;
+        max-width: 32rem;
+      }
+
+      .btn {
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--foreground);
+        padding: 0.9rem 1.5rem;
+        cursor: pointer;
+        transition: border-color 200ms ease, color 200ms ease;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+      }
+      .btn:hover { border-color: var(--primary); color: var(--primary); }
+
+      .stats { display: flex; gap: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border); margin-top: 1.5rem; }
+      .statValue {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.6rem;
+        color: var(--primary);
+        font-weight: 600;
+        line-height: 1;
+        margin: 0;
+      }
+      .statLabel {
+        color: var(--muted-foreground);
+        font-family: 'DM Mono', monospace;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+      }
+
+      .photoWrap { position: relative; }
+      .frameAccent {
+        position: absolute; inset: -1rem;
+        border: 1px solid var(--primary);
+        opacity: 0.3;
+        pointer-events: none;
+      }
+      .photoCard {
+        width: 340px; height: 420px;
+        background: rgba(255,255,255,0.04);
+        overflow: hidden;
+        border-radius: 2px;
+      }
+      .photoCard img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+      .floatCard {
+        position: absolute;
+        right: -0.9rem; bottom: -1rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        padding: 0.95rem 1.2rem;
+        min-width: 190px;
+      }
+      .floatCard p { margin: 0; color: var(--muted-foreground); font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; }
+
+      /* scroll cue */
+      @keyframes floatDownUp {
+        0%, 100% { transform: translate(-50%, 0); }
+        50% { transform: translate(-50%, 6px); }
+      }
+      .scrollCue {
+        position: absolute; bottom: 2rem; left: 50%;
+        transform: translateX(-50%);
+        color: var(--muted-foreground);
+        display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+        cursor: pointer; background: transparent; border: 0;
+        animation: floatDownUp 2.4s ease-in-out infinite;
+      }
+      .scrollCue span { font-size: 0.65rem; font-family: 'DM Mono', monospace; letter-spacing: 0.12em; }
+
+      /* Generic cards/text blocks */
+      .muted { color: var(--muted-foreground); }
+      .primary { color: var(--primary); }
+      .kicker { font-family: 'DM Mono', monospace; letter-spacing: 0.15em; font-size: 0.7rem; text-transform: uppercase; }
+      h2.sectionTitle { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 600; margin: 0; }
+
+      /* About */
+      .sectionHeader {
+        margin-bottom: 4rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--border);
+        display: flex; align-items: flex-end; justify-content: space-between;
+        gap: 1rem;
+      }
+      .twoCol { display: grid; grid-template-columns: 1fr; gap: 4rem; }
+      @media (min-width: 768px) { .twoCol { grid-template-columns: 1fr 1fr; } }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        padding: 1.25rem;
+      }
+
+      /* Grid hover */
+      .skillCard { transition: border-color 300ms ease; }
+      .skillCard:hover { border-color: rgba(201,169,110,0.3); }
+
+      /* Portfolio */
+      .filterRow { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2.5rem; }
+      .chip {
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--muted-foreground);
+        padding: 0.55rem 0.9rem;
+        cursor: pointer;
+        font-family: 'DM Mono', monospace;
+        letter-spacing: 0.07em;
+        font-size: 0.75rem;
+        transition: all 200ms ease;
+      }
+      .chip.active { border-color: var(--primary); color: var(--primary); background: rgba(201,169,110,0.08); }
+
+      .gridPortfolio { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+      @media (min-width: 640px) { .gridPortfolio { grid-template-columns: 1fr 1fr; } }
+      @media (min-width: 1024px) { .gridPortfolio { grid-template-columns: repeat(3, 1fr); } }
+
+      .project {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid var(--border);
+        cursor: pointer;
+        overflow: hidden;
+        transition: border-color 300ms ease, transform 300ms ease;
+      }
+      .project:hover { border-color: rgba(201,169,110,0.3); transform: translateY(-2px); }
+
+      .thumb { position: relative; height: 220px; background: rgba(255,255,255,0.04); overflow: hidden; }
+      .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 500ms ease; }
+      .project:hover .thumb img { transform: scale(1.05); }
+
+      .thumbOverlay {
+        position: absolute; inset: 0;
+        background: rgba(8,8,9,0.5);
+        opacity: 0; transition: opacity 300ms ease;
+      }
+      .project:hover .thumbOverlay { opacity: 1; }
+
+      .thumbBadgeTopLeft {
+        position: absolute; top: 0.75rem; left: 0.75rem;
+        padding: 0.4rem 0.5rem;
+        background: rgba(10,10,12,0.75);
+        backdrop-filter: blur(6px);
+        color: var(--muted-foreground);
+        font-family: 'DM Mono', monospace;
+        letter-spacing: 0.07em;
+        font-size: 0.62rem;
+      }
+      .thumbLink {
+        position: absolute; top: 0.75rem; right: 0.75rem;
+        width: 24px; height: 24px;
+        background: rgba(10,10,12,0.75);
+        backdrop-filter: blur(6px);
+        border-radius: 999px;
+        display: flex; align-items: center; justify-content: center;
+        opacity: 0; transition: opacity 300ms ease;
+      }
+      .project:hover .thumbLink { opacity: 1; }
+
+      .thumbBadgeCount {
+        position: absolute; bottom: 0.75rem; right: 0.75rem;
+        background: rgba(10,10,12,0.75);
+        backdrop-filter: blur(6px);
+        padding: 0.25rem 0.5rem;
+        color: var(--primary);
+        font-family: 'DM Mono', monospace;
+        font-size: 0.65rem;
+        display: inline-flex; align-items: center; gap: 0.35rem;
+      }
+
+      .projBody { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+      .projTitle { margin: 0; font-weight: 500; }
+
+      /* Modal */
+      .modalBackdrop {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0.75);
+        backdrop-filter: blur(4px);
+        z-index: 100;
+      }
+      .modal {
+        position: fixed;
+        z-index: 101;
+        left: 50%; top: 50%;
+        transform: translate(-50%, -50%) scale(0.95) translateY(20px);
+        width: 100%; max-width: 44rem;
+        background: var(--card);
+        border: 1px solid var(--border);
+        max-height: 92vh;
+        overflow: auto;
+        opacity: 0;
+        transition: opacity 280ms ease, transform 280ms ease;
+      }
+      .modal.open {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) translateY(0);
+      }
+
+      .carousel { position: relative; height: 320px; background: rgba(255,255,255,0.04); overflow: hidden; }
+      .carousel img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+      .carBtn {
+        position: absolute; top: 50%; transform: translateY(-50%);
+        width: 32px; height: 32px;
+        border-radius: 999px;
+        border: 0;
+        background: rgba(10,10,12,0.7);
+        backdrop-filter: blur(6px);
+        cursor: pointer;
+        color: var(--foreground);
+        display: flex; align-items: center; justify-content: center;
+        transition: color 150ms ease, background 150ms ease;
+      }
+      .carBtn:hover { color: var(--primary); background: rgba(10,10,12,0.9); }
+      .carBtn.left { left: 0.75rem; }
+      .carBtn.right { right: 0.75rem; }
+
+      .carDots { position: absolute; bottom: 0.75rem; left: 50%; transform: translateX(-50%); display: flex; gap: 0.5rem; }
+      .dot { width: 6px; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.35); border: 0; cursor: pointer; transition: width 200ms ease, background 200ms ease; }
+      .dot.active { width: 20px; background: var(--primary); }
+
+      /* Footer */
+      footer { border-top: 1px solid var(--border); padding: 3.5rem 0; }
+
+      .footerGrid { display: grid; grid-template-columns: 1fr; gap: 2.5rem; }
+      @media (min-width: 640px) { .footerGrid { grid-template-columns: 1fr 1fr 1fr; } }
+
+      .social a {
+        width: 2rem; height: 2rem;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        display: inline-flex; align-items: center; justify-content: center;
+        margin-right: 0.5rem;
+        color: var(--muted-foreground);
+        text-decoration: none;
+        transition: color 200ms ease, border-color 200ms ease;
+      }
+      .social a:hover { color: var(--primary); border-color: rgba(201,169,110,0.4); }
+
+      .footerBottom { border-top: 1px solid var(--border); padding-top: 1.25rem; margin-top: 2rem; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.75rem; }
+
+      /* Forms left for later (Contact right side in TSX was empty in file) */
+    </style>
+  </head>
+
+  <body>
+    <header id="siteHeader">
+      <div class="container">
+        <nav>
+          <a class="brand" href="#" id="brandLink">Ismi Anjar Farida, S.S.I</a>
+
+          <div class="desktopNav" style="display:none; gap:2rem; align-items:center;">
+            <button class="navlink" data-href="#about">About</button>
+            <button class="navlink" data-href="#portfolio">Portfolio</button>
+            <button class="navlink" data-href="#experience">Experience</button>
+            <button class="navlink" data-href="#organization">Organization</button>
+            <button class="navlink" data-href="#contact">Contact</button>
+          </div>
+
+          <button class="iconBtn" id="mobileToggle" aria-label="Toggle menu" style="display:inline-flex;">
+            <!-- hamburger (simple) -->
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <div id="drawer" class="drawer" data-open="false" style="display:flex;">
+      <button data-href="#about">About</button>
+      <button data-href="#portfolio">Portfolio</button>
+      <button data-href="#experience">Experience</button>
+      <button data-href="#organization">Organization</button>
+      <button data-href="#contact">Contact</button>
+      <a href="/cv-placeholder.pdf" download="Sari_Dewi_CV.pdf">
+        <span style="width:16px; height:16px; display:inline-block; border:1px solid var(--primary); border-radius:3px;"></span>
+        Download CV
+      </a>
+    </div>
+
+    <main>
+      <!-- HERO -->
+      <section class="hero">
+        <div class="gridOverlay"></div>
+        <div class="glow"></div>
+
+        <div class="heroGrid">
+          <div class="reveal" data-from-x="-30" style="display:flex; flex-direction:column; gap:1.5rem;">
+            <span class="badge">BNSP Certified</span>
+
+            <h1 class="heroTitle">Ismi Anjar<br /><em>Farida</em></h1>
+
+            <p class="heroP">
+              Information Science professional specializing in document management, digital workflows, and administrative excellence.
+              Certified by BNSP in Office Administration.
+            </p>
+
+            <div style="display:flex; flex-wrap:wrap; gap:1rem; margin-top:0.5rem;">
+              <button class="btn" id="contactBtn" style="border-color: var(--border); color: var(--foreground); background: transparent;">
+                CONTACT ME
+              </button>
+            </div>
+
+            <div class="stats">
+              <div>
+                <p class="statValue">3</p>
+                <div class="statLabel">CERTIFICATIONS</div>
+              </div>
+              <div>
+                <p class="statValue">10+</p>
+                <div class="statLabel">PROJECTS DONE</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="heroRight reveal" data-from-x="30" style="position:relative; display:flex; justify-content:flex-end;">
+            <div class="photoWrap">
+              <div class="frameAccent"></div>
+              <div class="photoCard">
+                <img src="./src/imports/Foto_Profil_Ismi-1.png" alt="Ismi Anjar Farida — professional portrait" />
+              </div>
+              <div class="floatCard">
+                <p>
+                  Information Management Specialist | Digital Asset & Research Data Enthusiast | Library and Information Science Graduate
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="scrollCue" id="scrollCue">
+          <span>SCROLL</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </section>
+
+      <!-- ABOUT -->
+      <section id="about" class="section">
+        <div class="container">
+          <div class="sectionHeader reveal" data-from-y="20">
+            <div>
+              <div class="kicker primary" style="margin-bottom:0.5rem;">01 — ABOUT</div>
+              <h2 class="sectionTitle">Professional Profile</h2>
+            </div>
+          </div>
+
+          <div class="twoCol">
+            <div class="reveal" data-from-y="20">
+              <p class="muted" style="font-size:1.05rem; line-height:1.8; font-weight:300;">
+                I am an Information Science professional with deep expertise in office administration, document management, and digital
+                record-keeping systems. With a BNSP certification and years of hands-on experience in government and private sector
+                environments, I help organizations build efficient, compliant, and well-documented administrative workflows.
+              </p>
+              <p class="muted" style="margin-top:1.25rem; font-size:0.95rem; line-height:1.8; font-weight:300;">
+                My approach combines systematic information organization with modern digital tools — ensuring that records are accessible,
+                auditable, and secure. I am passionate about transforming chaotic administrative environments into structured,
+                high-performing systems.
+              </p>
+
+              <div style="margin-top:1.25rem;">
+                <div class="muted" style="font-family:'DM Mono', monospace; letter-spacing:0.12em; font-size:0.7rem; margin-bottom:1rem;">
+                  CERTIFICATIONS
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                  <div style="display:flex; gap:0.75rem; align-items:flex-start;">
+                    <span style="color:var(--primary); margin-top:0.15rem;">✓</span>
+                    <div>
+                      <div style="font-weight:500;">Office Administration</div>
+                      <div class="muted" style="font-family:'DM Mono', monospace; font-size:0.775rem;">
+                        Indonesian Professional Certification Authority (BNSP) · 2024
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display:flex; gap:0.75rem; align-items:flex-start;">
+                    <span style="color:var(--primary); margin-top:0.15rem;">✓</span>
+                    <div>
+                      <div style="font-weight:500;">Data Analytics</div>
+                      <div class="muted" style="font-family:'DM Mono', monospace; font-size:0.775rem;">
+                        Mini Course by RevoU · 2025
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display:flex; gap:0.75rem; align-items:flex-start;">
+                    <span style="color:var(--primary); margin-top:0.15rem;">✓</span>
+                    <div>
+                      <div style="font-weight:500;">Predictive Maintenance</div>
+                      <div class="muted" style="font-family:'DM Mono', monospace; font-size:0.775rem;">
+                        Indonesian Professional Certification Authority (BNSP) · 2025
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="reveal" data-from-y="20" style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+              <div class="card skillCard">
+                <div class="kicker primary">DOCUMENT MANAGEMENT</div>
+                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.35rem;">
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Records Classification</li>
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Digital Archiving</li>
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>SOP Development</li>
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Filing Systems</li>
+                </ul>
+              </div>
+
+              <div class="card skillCard">
+                <div class="kicker primary">DATA & REPORTING</div>
+                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.35rem;">
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>MS Excel Advanced</li>
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Google Workspace</li>
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Data Entry & Validation</li>
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Report Compilation</li>
+                </ul>
+              </div>
+
+              <div class="card skillCard">
+                <div class="kicker primary">ADMINISTRATION</div>
+                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.35rem;">
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Correspondence Management</li>
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Meeting Coordination</li>
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Procurement Support</li>
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Budget Tracking</li>
+                </ul>
+              </div>
+
+              <div class="card skillCard">
+                <div class="kicker primary">DIGITAL TOOLS</div>
+                <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.35rem;">
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Microsoft Office</li>
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Google Workspace</li>
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>FIGMA</li>
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Database Management</li>
+                  <li class="muted" style="font-size:0.85rem;"><span style="display:inline-block; width:0.25rem; height:0.25rem; border-radius:999px; background:var(--primary); margin-right:0.5rem;"></span>Canva</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PORTFOLIO / GALLERY -->
+      <section id="portfolio" class="section bg-card" style="padding-top:7rem;">
+        <div class="container">
+          <div class="sectionHeader reveal" data-from-y="20">
+            <div>
+              <div class="kicker primary" style="margin-bottom:0.5rem;">02 — PORTFOLIO</div>
+              <h2 class="sectionTitle">Selected Work</h2>
+            </div>
+            <div class="muted" id="portfolioCount" style="font-family:'DM Mono', monospace; font-size:0.75rem;">0 PROJECTS</div>
+          </div>
+
+          <div class="filterRow reveal" data-from-y="20" id="filterRow"></div>
+
+          <div class="gridPortfolio" id="projectsGrid"></div>
+        </div>
+      </section>
+
+      <!-- EXPERIENCE -->
+      <section id="experience" class="section">
+        <div class="container">
+          <div class="sectionHeader reveal" data-from-y="20" style="margin-bottom:4rem;">
+            <div>
+              <div class="kicker primary" style="margin-bottom:0.5rem;">03 — EXPERIENCE</div>
+              <h2 class="sectionTitle">Career History</h2>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr; gap:3rem;">
+            <div class="reveal" data-from-x="-20" style="position:relative; padding-left:2rem;">
+              <div id="experienceTimeline" style="display:flex; flex-direction:column; gap:0; position:relative;"></div>
+            </div>
+
+            <aside class="reveal" data-from-x="20" style="display:flex; flex-direction:column; gap:1rem;">
+              <div class="muted" style="font-family:'DM Mono', monospace; letter-spacing:0.12em; font-size:0.7rem;">EDUCATION</div>
+              <div id="educationCards" style="display:flex; flex-direction:column; gap:1rem;"></div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- ORGANIZATION -->
+      <section id="organization" class="section bg-card">
+        <div class="container">
+          <div class="sectionHeader reveal" data-from-y="20">
+            <div>
+              <div class="kicker primary" style="margin-bottom:0.5rem;">04 — ORGANIZATION</div>
+              <h2 class="sectionTitle">Organizational Experience</h2>
+            </div>
+            <div class="muted" style="font-family:'DM Mono', monospace; font-size:0.75rem;" id="orgCount">0 ROLES</div>
+          </div>
+
+          <div id="orgGrid" style="display:grid; grid-template-columns:1fr; gap:1.5rem;">
+            <!-- JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact" class="section bg-card">
+        <div class="container">
+          <div class="sectionHeader reveal" data-from-y="20">
+            <div>
+              <div class="kicker primary" style="margin-bottom:0.5rem;">05 — CONTACT</div>
+              <h2 class="sectionTitle">Get in Touch</h2>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr; gap:3rem;">
+            <div class="reveal" data-from-x="-20">
+              <p class="muted" style="font-size:1rem; line-height:1.8; font-weight:300; margin:0 0 1.25rem 0;">
+                Whether you have a project in mind, need administrative bottlenecks, or simply want to connect — I'd love to hear from you.
+              </p>
+
+              <div style="display:flex; flex-direction:column; gap:1.25rem;">
+                <div style="display:flex; gap:1rem;">
+                  <div style="width:2rem; height:2rem; border:1px solid var(--border); border-radius:999px; display:flex; align-items:center; justify-content:center; color:var(--primary);">@</div>
+                  <div>
+                    <div class="muted" style="font-family:'DM Mono', monospace; letter-spacing:0.12em; font-size:0.65rem;">EMAIL</div>
+                    <a href="mailto:ismi.anjar@gmail.com" style="color:var(--foreground); text-decoration:none; font-family:'DM Sans', sans-serif; font-size:0.9rem;">ismi.anjar@gmail.com</a>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:1rem;">
+                  <div style="width:2rem; height:2rem; border:1px solid var(--border); border-radius:999px; display:flex; align-items:center; justify-content:center; color:var(--primary);">☎</div>
+                  <div>
+                    <div class="muted" style="font-family:'DM Mono', monospace; letter-spacing:0.12em; font-size:0.65rem;">WHATSAPP</div>
+                    <a href="https://wa.me/6285225177286" target="_blank" rel="noopener noreferrer" style="color:var(--foreground); text-decoration:none; font-family:'DM Sans', sans-serif; font-size:0.9rem;">+6285225177286</a>
+                  </div>
+                </div>
+
+                <div style="display:flex; gap:1rem;">
+                  <div style="width:2rem; height:2rem; border:1px solid var(--border); border-radius:999px; display:flex; align-items:center; justify-content:center; color:var(--primary);">⌁</div>
+                  <div>
+                    <div class="muted" style="font-family:'DM Mono', monospace; letter-spacing:0.12em; font-size:0.65rem;">LOCATION</div>
+                    <div class="foreground" style="color:var(--foreground); font-family:'DM Sans', sans-serif; font-size:0.9rem;">Banyumas, Central Java, Indonesia</div>
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn" id="whatsAppShortcut" style="margin-top:1.5rem; text-transform:none; display:inline-flex; align-items:center; gap:0.75rem; justify-content:flex-start;">
+                <span style="color:var(--primary);">💬</span>
+                <span style="display:flex; flex-direction:column; align-items:flex-start; gap:0.15rem;">
+                  <span style="font-family:'DM Sans', sans-serif; font-weight:500; font-size:0.85rem; color:var(--foreground);">Send via WhatsApp</span>
+                  <span class="muted" style="font-family:'DM Mono', monospace; font-size:0.7rem;">Opens in a new window</span>
+                </span>
+              </button>
+            </div>
+
+            <div class="reveal" data-from-x="20" style="min-height:220px;">
+              <!-- Contact form omitted because in provided TSX file right side is empty -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer>
+        <div class="container">
+          <div class="footerGrid">
+            <div>
+              <div style="font-family:'Playfair Display', serif; font-size:1.2rem; font-weight:600;">Ismi Anjar Farida, S.S.I</div>
+              <p class="muted" style="font-size:0.85rem; line-height:1.7; font-weight:300; margin:0.8rem 0 0 0;">
+                Information Science professional.<br />
+                BNSP Certified — Office Administration.
+              </p>
+              <div class="social" style="margin-top:0.9rem;">
+                <a href="https://www.linkedin.com/in/ismi-anjar-farida-792393313/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">in</a>
+                <a href="https://www.instagram.com/iss_anf/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">IG</a>
+                <a href="mailto:ismi.anjar@gmail.com" aria-label="Email">@</a>
+              </div>
+            </div>
+
+            <div>
+              <div class="muted" style="font-family:'DM Mono', monospace; letter-spacing:0.14em; font-size:0.65rem; margin-bottom:0.75rem;">NAVIGATION</div>
+              <button class="navlink" data-href="#about" style="text-transform:none; font-size:0.875rem;">About</button><br/>
+              <button class="navlink" data-href="#portfolio" style="text-transform:none; font-size:0.875rem;">Portfolio</button><br/>
+              <button class="navlink" data-href="#experience" style="text-transform:none; font-size:0.875rem;">Experience</button><br/>
+              <button class="navlink" data-href="#contact" style="text-transform:none; font-size:0.875rem;">Contact</button>
+            </div>
+
+            <div>
+              <div class="muted" style="font-family:'DM Mono', monospace; letter-spacing:0.14em; font-size:0.65rem;">&nbsp;</div>
+            </div>
+          </div>
+
+          <div class="footerBottom">
+            <div class="muted" style="font-family:'DM Mono', monospace; font-size:0.72rem;">© 2026 Ismi Anjar Farida. All rights reserved.</div>
+            <div class="muted" style="font-family:'DM Mono', monospace; font-size:0.72rem;">Banyumas · Indonesia</div>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <!-- Gallery Modal -->
+    <div id="modalBackdrop" class="modalBackdrop" style="display:none;"></div>
+    <div id="modal" class="modal" aria-hidden="true">
+      <div style="position:relative;">
+        <div class="carousel" style="height:320px;">
+          <img id="carouselImage" src="" alt="" />
+
+          <button class="carBtn left" id="carPrev" aria-label="Previous">‹</button>
+          <button class="carBtn right" id="carNext" aria-label="Next">›</button>
+
+          <div class="carDots" id="carDots"></div>
+          <div id="carCounter" style="position:absolute; top:0.5rem; right:0.75rem; background:rgba(10,10,12,0.7); backdrop-filter:blur(6px); padding:0.2rem 0.5rem; font-family:'DM Mono', monospace; font-size:0.65rem; color:var(--muted-foreground);">
+            1 / 1
+          </div>
+        </div>
+        <button id="modalClose" class="carBtn" style="left:0.75rem; right:auto; top:0.75rem; transform:none; width:2rem; height:2rem; border-radius:999px;">
+          ✕
+        </button>
+      </div>
+
+      <div style="padding:2rem; display:flex; flex-direction:column; gap:1rem;">
+        <div class="muted" id="modalMeta" style="font-family:'DM Mono', monospace; font-size:0.7rem; letter-spacing:0.02em;">
+          
+        </div>
+        <h3 id="modalTitle" style="font-family:'Playfair Display', serif; font-size:1.5rem; font-weight:600; margin:0; line-height:1.3;">Title</h3>
+        <p id="modalDesc" class="muted" style="font-size:0.95rem; line-height:1.8; font-weight:300; margin:0;">Desc</p>
+        <div id="modalTags" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.25rem;"></div>
+      </div>
+    </div>
+
+    <script>
+      // Responsive navbar visibility
+      function syncNavVisibility() {
+        const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+        document.querySelector('.desktopNav').style.display = isDesktop ? 'flex' : 'none';
+        document.getElementById('mobileToggle').style.display = isDesktop ? 'none' : 'inline-flex';
+      }
+      window.addEventListener('resize', syncNavVisibility);
+      syncNavVisibility();
+
+      // Scroll header
+      const header = document.getElementById('siteHeader');
+      window.addEventListener('scroll', () => {
+        header.classList.toggle('scrolled', window.scrollY > 40);
+      });
+
+      // Reveal on view
+      const observer = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            e.target.classList.add('inview');
+            observer.unobserve(e.target);
+          }
+        }
+      }, { threshold: 0.15 });
+
+      document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+      // Smooth scroll for buttons with data-href
+      document.addEventListener('click', (ev) => {
+        const btn = ev.target.closest('[data-href]');
+        if (!btn) return;
+        const href = btn.getAttribute('data-href');
+        const drawer = document.getElementById('drawer');
+        if (drawer && drawer.getAttribute('data-open') === 'true') drawer.setAttribute('data-open', 'false');
+        const el = document.querySelector(href);
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      document.getElementById('contactBtn').addEventListener('click', () => {
+        document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      document.getElementById('scrollCue').addEventListener('click', () => {
+        document.querySelector('#portfolio')?.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      // Mobile drawer toggle
+      const drawer = document.getElementById('drawer');
+      const toggle = document.getElementById('mobileToggle');
+      toggle.addEventListener('click', () => {
+        const open = drawer.getAttribute('data-open') === 'true';
+        drawer.setAttribute('data-open', String(!open));
+      });
+
+      // Close drawer on ESC
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') drawer.setAttribute('data-open', 'false');
+      });
+
+      // ------- DATA (from TSX) -------
+      const categories = [
+        'All',
+        'Document Management',
+        'Data Analysis',
+        'Administrative Reports',
+        'Digital Workflows',
+        'Presentations',
+      ];
+
+      const items = [
+        {
+          id: 1,
+          title: 'Records Classification System',
+          description:
+            'Designed and implemented a comprehensive records classification system for a regional government office serving 500+ employees. The system standardized subject headings, retention schedules, and physical/digital filing conventions across all departments.',
+          category: 'Document Management',
+          images: [
+            'https://images.unsplash.com/photo-1768158989131-64cbff67f292?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1483058712412-4245e9b90334?w=900&h=600&fit=crop&auto=format',
+          ],
+          tags: ['Classification', 'SOP', 'Government'],
+          year: '2024',
+        },
+        {
+          id: 2,
+          title: 'Digital Archive Migration',
+          description:
+            'Led the migration of 10,000+ physical documents to a structured digital archive system with metadata tagging and full-text search indexing. Included quality-control auditing and staff training on retrieval workflows.',
+          category: 'Document Management',
+          images: [
+            'https://images.unsplash.com/photo-1758876201660-103984519266?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=900&h=600&fit=crop&auto=format',
+          ],
+          tags: ['Digitization', 'Metadata', 'Archiving'],
+          year: '2023',
+        },
+        {
+          id: 3,
+          title: 'HR Data Dashboard',
+          description:
+            'Built an interactive HR analytics dashboard tracking attendance, payroll, and performance metrics for 200+ staff members. Automated monthly summaries cut reporting time by 60%.',
+          category: 'Data Analysis',
+          images: [
+            'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1666875753105-c63a6f3bdc86?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1542744094-24638eff58bb?w=900&h=600&fit=crop&auto=format',
+          ],
+          tags: ['Excel', 'Dashboard', 'HR Analytics'],
+          year: '2024',
+        },
+        {
+          id: 4,
+          title: 'Budget Expenditure Analysis',
+          description:
+            'Quarterly analysis of departmental expenditures with variance reporting and forecasting for executive leadership review. Identified a 12% budget overrun three months before year-end, enabling corrective action.',
+          category: 'Data Analysis',
+          images: [
+            'https://images.unsplash.com/photo-1686061593213-98dad7c599b9?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1526628953301-3e589a6a8b74?w=900&h=600&fit=crop&auto=format',
+          ],
+          tags: ['Finance', 'Reporting', 'Forecasting'],
+          year: '2023',
+        },
+        {
+          id: 5,
+          title: 'Annual Performance Report 2023',
+          description:
+            'Compiled and formatted the organization\'s annual performance report, integrating data from 8 departments into a cohesive 60-page document. Delivered two weeks ahead of the government submission deadline.',
+          category: 'Administrative Reports',
+          images: [
+            'https://images.unsplash.com/photo-1735825764485-93a381fd5779?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1455849318743-b2233052fcff?w=900&h=600&fit=crop&auto=format',
+          ],
+          tags: ['Annual Report', 'Multi-department', 'Publishing'],
+          year: '2023',
+        },
+        {
+          id: 6,
+          title: 'Procurement Audit Summary',
+          description:
+            'Structured audit report covering procurement compliance across 12 procurement cycles, identifying 3 cost-saving opportunities and 2 process gaps flagged for corrective action.',
+          category: 'Administrative Reports',
+          images: [
+            'https://images.unsplash.com/photo-1761735486587-bcac08b15c79?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=900&h=600&fit=crop&auto=format',
+          ],
+          tags: ['Audit', 'Compliance', 'Procurement'],
+          year: '2024',
+        },
+        {
+          id: 7,
+          title: 'e-Office Implementation',
+          description:
+            'Coordinated the rollout of a paperless office system integrating e-signatures, digital workflows, and cloud document storage across 5 divisions. Reduced paper usage by 70% in the first quarter.',
+          category: 'Digital Workflows',
+          images: [
+            'https://images.unsplash.com/photo-1762341112610-58061dbace4e?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=900&h=600&fit=crop&auto=format',
+          ],
+          tags: ['e-Office', 'Automation', 'Cloud'],
+          year: '2024',
+        },
+        {
+          id: 8,
+          title: 'Standard Operating Procedures',
+          description:
+            'Developed a suite of 25 SOPs for administrative processes, reducing onboarding time for new staff by 40% and establishing consistent quality standards across departments.',
+          category: 'Digital Workflows',
+          images: [
+            'https://images.unsplash.com/photo-1762341116319-05a8355fcfc9?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=900&h=600&fit=crop&auto=format',
+          ],
+          tags: ['SOP', 'Process Design', 'Training'],
+          year: '2022',
+        },
+        {
+          id: 9,
+          title: 'Leadership Training Deck',
+          description:
+            'Designed a 45-slide presentation for executive leadership training on organizational change management and administrative reform, delivered to 60 department heads.',
+          category: 'Presentations',
+          images: [
+            'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1543269865-cbf427effbad?w=900&h=600&fit=crop&auto=format',
+          ],
+          tags: ['Training', 'Deck Design', 'Leadership'],
+          year: '2023',
+        },
+        {
+          id: 10,
+          title: 'Strategic Planning Workshop',
+          description:
+            'Facilitated documentation and visual materials for a 3-day strategic planning workshop attended by 60 department heads. Produced a final synthesis report adopted as the basis for the 2024–2026 roadmap.',
+          category: 'Presentations',
+          images: [
+            'https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&h=600&fit=crop&auto=format',
+            'https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=900&h=600&fit=crop&auto=format',
+          ],
+          tags: ['Workshop', 'Strategy', 'Facilitation'],
+          year: '2024',
+        },
+      ];
+
+      let activeCategory = 'All';
+
+      function renderFilters() {
+        const row = document.getElementById('filterRow');
+        row.innerHTML = '';
+        categories.forEach((cat) => {
+          const btn = document.createElement('button');
+          btn.className = 'chip' + (cat === activeCategory ? ' active' : '');
+          btn.textContent = cat;
+          btn.addEventListener('click', () => {
+            activeCategory = cat;
+            renderAll();
+          });
+          row.appendChild(btn);
+        });
+      }
+
+      function getFiltered() {
+        if (activeCategory === 'All') return items;
+        return items.filter((i) => i.category === activeCategory);
+      }
+
+      function renderProjects() {
+        const grid = document.getElementById('projectsGrid');
+        const list = getFiltered();
+        document.getElementById('portfolioCount').textContent = `${list.length} PROJECT${list.length !== 1 ? 'S' : ''}`;
+
+        grid.innerHTML = '';
+        list.forEach((item) => {
+          const el = document.createElement('div');
+          el.className = 'project reveal';
+          el.dataset.fromY = '20';
+          el.style.borderColor = 'rgba(255,255,255,0.14)';
+
+          el.innerHTML = `
+            <div class="thumb">
+              <img src="${item.images[0]}" alt="${item.title}" />
+              <div class="thumbOverlay"></div>
+              <div class="thumbLink" aria-hidden="true">↗</div>
+              ${item.images.length > 1 ? `<div class="thumbBadgeCount">⬛ ${item.images.length} photos</div>` : ''}
+              <div class="thumbBadgeTopLeft">${item.category.slice(0, 14).toUpperCase()}</div>
+            </div>
+            <div class="projBody">
+              <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:0.5rem;">
+                <h3 class="projTitle" style="margin:0; font-size:0.95rem; font-family:'DM Sans', sans-serif; font-weight:500; line-height:1.4;">${item.title}</h3>
+                <div class="muted" style="font-family:'DM Mono', monospace; font-size:0.7rem;">${item.year}</div>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:0.25rem; margin-top:0.25rem;">
+                ${item.tags.map((t) => `<span style="padding:0.25rem 0.5rem; border:1px solid var(--border); color:var(--muted-foreground); font-family:'DM Mono', monospace; font-size:0.65rem; letter-spacing:0.06em;">${t}</span>`).join('')}
+              </div>
+            </div>
+          `;
+
+          el.addEventListener('click', () => openModal(item));
+          grid.appendChild(el);
+        });
+
+        // Observe newly added reveal items
+        grid.querySelectorAll('.reveal').forEach((node) => observer.observe(node));
+      }
+
+      // Modal logic
+      const modalBackdrop = document.getElementById('modalBackdrop');
+      const modal = document.getElementById('modal');
+      let selected = null;
+      let currentIndex = 0;
+
+      function openModal(item) {
+        selected = item;
+        currentIndex = 0;
+
+        document.getElementById('carouselImage').src = selected.images[currentIndex];
+        document.getElementById('carouselImage').alt = `${selected.title} — photo ${currentIndex + 1}`;
+
+        document.getElementById('modalTitle').textContent = selected.title;
+        document.getElementById('modalDesc').textContent = selected.description;
+
+        const meta = `${selected.category.toUpperCase()} · ${selected.year} · ${selected.images.length} documentation photo${selected.images.length !== 1 ? 's' : ''}`;
+        document.getElementById('modalMeta').textContent = meta;
+
+        const tagsWrap = document.getElementById('modalTags');
+        tagsWrap.innerHTML = selected.tags.map((tag) => {
+          return `<span style="padding:0.5rem 0.75rem; border:1px solid rgba(201,169,110,0.4); color:var(--primary); font-family:'DM Mono', monospace; font-size:0.7rem; letter-spacing:0.08em;">${tag}</span>`;
+        }).join('');
+
+        renderDots();
+        updateCounter();
+
+        modalBackdrop.style.display = 'block';
+        modalBackdrop.style.opacity = '1';
+        modal.style.display = 'block';
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        setTimeout(() => {
+          modalBackdrop.style.display = 'none';
+          modal.style.display = 'none';
+        }, 300);
+        document.body.style.overflow = '';
+        selected = null;
+      }
+
+      document.getElementById('modalClose').addEventListener('click', closeModal);
+      modalBackdrop.addEventListener('click', closeModal);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+      });
+
+      function renderDots() {
+        const dots = document.getElementById('carDots');
+        dots.innerHTML = '';
+        selected.images.forEach((_, i) => {
+          const b = document.createElement('button');
+          b.className = 'dot' + (i === currentIndex ? ' active' : '');
+          b.setAttribute('aria-label', `Go to photo ${i + 1}`);
+          b.addEventListener('click', () => {
+            currentIndex = i;
+            updateImage();
+          });
+          dots.appendChild(b);
+        });
+      }
+
+      function updateCounter() {
+        document.getElementById('carCounter').textContent = `${currentIndex + 1} / ${selected.images.length}`;
+      }
+
+      function updateImage() {
+        document.getElementById('carouselImage').src = selected.images[currentIndex];
+        document.getElementById('carouselImage').alt = `${selected.title} — photo ${currentIndex + 1}`;
+        renderDots();
+        updateCounter();
+      }
+
+      document.getElementById('carPrev').addEventListener('click', () => {
+        if (!selected) return;
+        currentIndex = (currentIndex - 1 + selected.images.length) % selected.images.length;
+        updateImage();
+      });
+      document.getElementById('carNext').addEventListener('click', () => {
+        if (!selected) return;
+        currentIndex = (currentIndex + 1) % selected.images.length;
+        updateImage();
+      });
+
+      // Experience data
+      const experiences = [
+        {
+          role: 'Open Journal Systems (OJS) Administrator Intern',
+          organization: 'Informatio Journal Padjadjaran University',
+          location: 'Sumedang, West Java',
+          period: 'Jul 2022 — Oct 2022',
+          description:
+            'As an OJS Administrator Intern, I was responsible for supporting the technical and administrative operations of an academic journal platform. My work focused on user management, metadata maintenance, and ensuring efficient editorial workflows to support scholarly communication and publication activities..',
+          highlights: [
+            'Managed user accounts and resolved access-related issues to ensure uninterrupted platform functionality',
+            'Successfully registered and configured accounts for 18 interns within a single day accelerating the onboarding process',
+            'Maintained and updated journal metadata to improve database accuracy, discoverability, and search performance',
+            'Supported editors and users in navigating the Open Journal Systems platform effectively',
+          ],
+        },
+        {
+          role: 'Library Assistant Intern',
+          organization: 'Kandaga Unpad (Central Library, Padjadjaran University)',
+          location: 'Sumedang, West Java',
+          period: 'Jan 2024 — Feb 2024',
+          description:
+            'During my internship at the Central Library of Padjadjaran University, I contributed to library operations, metadata management, collection organization, and information literacy initiatives. I played a key role in maintaining operational continuity during system disruptions while supporting the library\'s commitment to delivering reliable information services to academic users.',
+          highlights: [
+            'Developed a temporary metadata management workflow using Google Sheets to maintain processing activities for over 50 specialized academic collections during system downtime',
+            'Preserved 100% data integrity and ensured seamless migration back to the library management system once services were restored',
+            'Conducted a rapid inventory audit of reference collections and synchronized digital gallery databases within five business days',
+            'Produced information literacy materials and curated bibliographies to support students in developing independent research and information-seeking skills',
+          ],
+        },
+        {
+          role: 'Journal Management Intern',
+          organization: 'LLDIKTI Region III Jakarta',
+          location: 'East Jakarta',
+          period: 'Sep 2024 — Des 2024',
+          description:
+            'As a Journal Management Intern under the MSIB Program, I supported the administration of scholarly publications, research documentation, and institutional knowledge management initiatives within one of Indonesia\'s higher education service institutions. My role involved ensuring the continuity of publication workflows, managing large-scale research archives, coordinating academic programs, and facilitating communication among universities, government agencies, and external stakeholders.',
+          highlights: [
+            'Ensured editorial workflow continuity during a nationwide Open Journal Systems (OJS) outage by conducting manual quality screenings and compliance checks for incoming journal submissions',
+            'Managed and organized hundreds of research and community service contracts, maintaining data integrity and improving retrieval efficiency for institutional reporting purposes',
+            'Coordinated the publication process of a four-chapter technical book within a one-month deadline, ensuring compliance with official publication standards',
+            'Supported the implementation of the Smart Village program through documentation management, stakeholder coordination, and official correspondence handling',
+            'Assisted in organizing academic literacy webinars on scholarly article writing for more than 100 lecturers across LLDIKTI Region III',
+            'Coordinated podcast and webinar activities with external partners to ensure smooth event execution and resource fulfillment',
+          ],
+        },
+        {
+          role: 'Personal Research Assistant to Senior Lecturer',
+          organization: 'Padjadjaran University',
+          location: 'Sumedang, West Java',
+          period: 'Mar 2026 — Now',
+          description:
+            'Provided direct, high-level research and administrative support to a Senior Lecturer, managing private research data workflows and departmental project logistics.',
+          highlights: [
+            'Served as the primary Data Steward for the lecturer\'s independent research projects, responsible for collecting, cleaning, and structuring raw datasets',
+            'Maintained advanced spreadsheets and developed data visualizations using R Studio to support the lecturer\'s academic presentations and analysis',
+            'Conducted comprehensive literature reviews, citation auditing, and manuscript formatting to align draft papers with institutional standards',
+            'Managed the lecturer\'s academic scheduling, digital correspondence, and research documentation with strict confidentiality and organization',
+          ],
+        },
+      ];
+
+      const education = [
+        {
+          degree: 'S1 — Library and Information Science (Perpustakaan dan Sains Informasi)',
+          institution: 'Padjadjaran University',
+          location: 'Sumedang',
+          year: '2026',
+          gpa: '3.74',
+        },
+        {
+          degree: 'Publication ISSN',
+          institution: 'Kebijakan/Regulasi yang Dilakukan oleh Petugas Museum Geologi Bandung',
+          location: 'Published in Buletin Perpustakaan Journal UII, Vol. 6 No. 1',
+          year: '2023',
+          gpa: '',
+        },
+        {
+          degree: 'Publication Scopus Q3',
+          institution:
+            'A systematic review of the application of augmented reality (AR) technology for the visualization and management of digital assets in libraries',
+          location: 'Published in Record and Library Journal (RLJ) Vol.11 No.2',
+          year: '2025',
+          gpa: '',
+        },
+        {
+          degree: 'Undergraduate Thesis',
+          institution:
+            'Augmented Reality Publication Trends in Libraries (A Bibliometric Study of Scopus-Indexed Publications 2014-2024)',
+          location: 'Padjadjaran University',
+          year: '2026',
+          gpa: '',
+        },
+      ];
+
+      function renderExperience() {
+        const timeline = document.getElementById('experienceTimeline');
+        timeline.innerHTML = '';
+
+        experiences.forEach((exp, idx) => {
+          const wrap = document.createElement('div');
+          wrap.style.position = 'relative';
+          wrap.style.paddingBottom = idx < experiences.length - 1 ? '3rem' : '0';
+          wrap.innerHTML = `
+            ${idx < experiences.length - 1 ? `<div style="position:absolute; left:-0.85rem; top:1.3rem; bottom:0; width:1px; background:var(--border);"></div>` : ''}
+            <div style="position:absolute; left:-1.8rem; top:0.2rem; width:14px; height:14px; border:2px solid var(--primary); background:var(--background); border-radius:50%;"></div>
+            <div style="margin-left:0; padding-left:0.25rem;">
+              <div style="display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center; margin-bottom:0.25rem;">
+                <div class="muted" style="font-family:'DM Mono', monospace; font-size:0.7rem; letter-spacing:0.1em;">${exp.period}</div>
+                <span style="padding:0.25rem 0.5rem; border:1px solid var(--border); color:var(--muted-foreground); font-family:'DM Mono', monospace; font-size:0.65rem;">${exp.location}</span>
+              </div>
+              <div style="font-family:'DM Sans', sans-serif; font-size:1.05rem; font-weight:600; margin:0;">${exp.role}</div>
+              <div style="color:var(--primary); font-family:'DM Sans', sans-serif; font-size:0.85rem; font-weight:400; margin-top:0.15rem;">${exp.organization}</div>
+              <p class="muted" style="font-family:'DM Sans', sans-serif; font-size:0.9rem; line-height:1.7; font-weight:300; margin-top:0.6rem; margin-bottom:0.8rem;">${exp.description}</p>
+              <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.5rem;">
+                ${exp.highlights.map(h => `<li class="muted" style="display:flex; gap:0.5rem; align-items:flex-start; font-size:0.83rem; font-family:'DM Sans', sans-serif; line-height:1.6;"><span style="color:var(--primary); margin-top:0.35rem;">—</span>${h}</li>`).join('')}
+              </ul>
+            </div>
+          `;
+          timeline.appendChild(wrap);
+        });
+      }
+
+      function renderEducation() {
+        const wrap = document.getElementById('educationCards');
+        wrap.innerHTML = '';
+        education.forEach((edu) => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.style.padding = '1.25rem';
+          card.innerHTML = `
+            <div style="font-family:'DM Sans', sans-serif; font-size:0.875rem; font-weight:500; line-height:1.4;">${edu.degree}</div>
+            <div style="color:var(--primary); font-family:'DM Sans', sans-serif; font-size:0.8rem; margin-top:0.25rem;">${edu.institution}</div>
+            <div style="display:flex; align-items:center; gap:1rem; margin-top:0.5rem; flex-wrap:wrap;">
+              <div class="muted" style="font-family:'DM Mono', monospace; font-size:0.7rem;">${edu.location} · ${edu.year}</div>
+              ${edu.gpa ? `<div style="border:1px solid rgba(201,169,110,0.3); color:var(--primary); font-family:'DM Mono', monospace; font-size:0.65rem; padding:0.25rem 0.5rem;">GPA ${edu.gpa}</div>` : ''}
+            </div>
+          `;
+          wrap.appendChild(card);
+        });
+      }
+
+      // Organization
+      const orgExperiences = [
+        {
+          role: 'Head of Information & Communication Division',
+          organization: 'Himpunan Mahasiswa Ilmu Perpustakaan (HIMAPI) — Padjadjaran University',
+          period: 'Mar 2022 — Mar 2023',
+          location: 'Sumedang, West Java',
+          description:
+            'Led the Information & Communication Division within the Library Science student association. Managed internal communications, designed informational content, maintained the organization\'s social media presence, and coordinated inter-division knowledge-sharing sessions.',
+          achievements: [
+            'Grew the organization\'s Instagram account from 600 to 1,400+ followers through consistent, professional content strategy',
+            'Produced 30+ informational posts and event recaps distributed to 400+ student members',
+            'Coordinated communication between 5 divisions to ensure timely information flow during major annual events',
+            'Designed the visual identity materials (banner, poster, digital assets) for the 2022 HIMAPI Study Tour',
+          ],
+        },
+        {
+          role: 'Event Documentation Coordinator',
+          organization: 'Komunitas Mahasiswa Banyumas (KOMAS) — Padjadjaran University',
+          period: 'Aug 2021 — Aug 2022',
+          location: 'Sumedang, West Java',
+          description:
+            'Managed all documentation and administrative records for KOMAS events and activities. Responsible for meeting minutes, formal correspondence, archive organization, and end-of-period accountability reports submitted to the university\'s student affairs office.',
+          achievements: [
+            'Produced comprehensive activity reports for 12 organizational events submitted to university administration',
+            'Maintained a structured digital archive of all organizational documents using Google Drive with standardized naming conventions',
+            'Facilitated 3 inter-regional student coordination meetings between Banyumas student communities across different universities',
+            'Compiled and edited a 40-page annual yearbook documenting KOMAS activities throughout the academic year',
+          ],
+        },
+        {
+          role: 'Volunteer — Library Literacy Program',
+          organization: 'Relawan Literasi Perpustakaan Daerah Banyumas',
+          period: 'Jun 2020 — Dec 2020',
+          location: 'Banyumas, Central Java',
+          description:
+            'Participated as a volunteer in a regional public library literacy initiative aimed at increasing reading engagement among elementary and junior high school students. Activities included storytelling sessions, reading guides, and basic information literacy workshops.',
+          achievements: [
+            'Facilitated weekly reading sessions for 30–50 children aged 8–14 at the Banyumas Regional Public Library',
+            'Developed 5 age-appropriate reading activity modules adopted by the library for ongoing use',
+            'Supported the library\'s Summer Reading Challenge, resulting in a 25% increase in youth library card registrations',
+            'Assisted in cataloging and shelving approximately 300 newly donated books to improve collection accessibility',
+          ],
+        },
+        {
+          role: 'Staff — Academic & Research Affairs',
+          organization: 'Badan Eksekutif Mahasiswa (BEM) Fakultas Ilmu Komunikasi — Padjadjaran University',
+          period: 'Apr 2023 — Apr 2024',
+          location: 'Sumedang, West Java',
+          description:
+            'Served in the Academic & Research division of the Faculty of Communication Sciences\' student executive body. Focused on supporting academic advocacy, facilitating research publication workshops, and maintaining documentation of faculty-level student activities.',
+          achievements: [
+            'Organized 2 academic writing workshops attended by 120+ students, with post-event satisfaction ratings above 90%',
+            'Maintained an archive of student research proposals, journal submissions, and competition entries for faculty reporting',
+            'Assisted in the publication of BEM\'s academic bulletin, coordinating submissions from 8 contributors across departments',
+            'Represented student academic interests in 4 meetings with faculty academic committee, resulting in updated research mentorship guidelines',
+          ],
+        },
+      ];
+
+      function renderOrg() {
+        document.getElementById('orgCount').textContent = `${orgExperiences.length} ROLES`;
+        const grid = document.getElementById('orgGrid');
+
+        grid.innerHTML = '';
+
+        grid.style.gridTemplateColumns = window.innerWidth >= 1024 ? '1fr 1fr' : '1fr';
+
+        orgExperiences.forEach((org, idx) => {
+          const card = document.createElement('div');
+          card.className = 'card reveal';
+          card.dataset.fromY = '20';
+          card.style.padding = '1.75rem 1.75rem';
+          card.style.background = 'transparent';
+          card.style.border = '1px solid var(--border)';
+          card.style.transition = 'border-color 300ms ease';
+          card.addEventListener('mouseenter', () => (card.style.borderColor = 'rgba(201,169,110,0.3)'));
+          card.addEventListener('mouseleave', () => (card.style.borderColor = 'var(--border)'));
+
+          card.innerHTML = `
+            <div style="display:flex; gap:1rem;">
+              <div style="width:2.5rem; height:2.5rem; border:1px solid var(--border); border-radius:0; display:flex; align-items:center; justify-content:center; color:var(--primary); flex-shrink:0;">👥</div>
+              <div style="display:flex; flex-direction:column; gap:0.25rem; min-width:0;">
+                <h3 style="margin:0; font-family:'DM Sans', sans-serif; font-size:0.975rem; font-weight:600; line-height:1.35;">${org.role}</h3>
+                <div style="color:var(--primary); font-family:'DM Sans', sans-serif; font-size:0.82rem; font-weight:400;">${org.organization}</div>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.75rem;">
+              <span style="padding:0.35rem 0.75rem; border:1px solid var(--border); color:var(--muted-foreground); font-family:'DM Mono', monospace; font-size:0.67rem;">${org.period}</span>
+              <span style="padding:0.35rem 0.75rem; border:1px solid var(--border); color:var(--muted-foreground); font-family:'DM Mono', monospace; font-size:0.67rem;">${org.location}</span>
+            </div>
+
+            <p class="muted" style="font-family:'DM Sans', sans-serif; font-size:0.875rem; line-height:1.75; font-weight:300; margin:1rem 0 0 0;">${org.description}</p>
+
+            <div style="border-top:1px solid var(--border); margin-top:1.1rem;"></div>
+
+            <div style="display:flex; flex-direction:column; gap:0.6rem; margin-top:1.1rem;">
+              <div class="muted" style="font-family:'DM Mono', monospace; letter-spacing:0.12em; font-size:0.65rem;">KEY CONTRIBUTIONS</div>
+              <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:0.5rem;">
+                ${org.achievements.map(a => `<li class="muted" style="display:flex; gap:0.5rem; align-items:flex-start; font-size:0.845rem; font-family:'DM Sans', sans-serif; line-height:1.6;"><span style="color:var(--primary); margin-top:0.2rem; font-size:0.6rem;">◆</span>${a}</li>`).join('')}
+              </ul>
+            </div>
+          `;
+          grid.appendChild(card);
+          observer.observe(card);
+        });
+      }
+
+      document.getElementById('whatsAppShortcut').addEventListener('click', () => {
+        window.open('https://wa.me/6285225177286', '_blank');
+      });
+
+      function renderAll() {
+        renderFilters();
+        renderProjects();
+      }
+
+      // Init
+      renderAll();
+      renderExperience();
+      renderEducation();
+      renderOrg();
+    </script>
+
+    <script>
+      // Ensure default display for modal
+      document.getElementById('modal').style.display = 'none';
+    </script>
+  </body>
+</html>
+
